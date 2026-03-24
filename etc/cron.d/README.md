@@ -1,6 +1,6 @@
 # Automated Scheduling with Cron
 
-The project includes a cron file (`etc/cron.d/bitcoinaudit`) that runs the bot once a day at 09:00.
+The project includes a cron file (`etc/cron.d/bitcoinaudit`) that runs the bot once a day at midnight.
 
 ## Installation steps
 
