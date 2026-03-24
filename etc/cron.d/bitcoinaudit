@@ -6,6 +6,7 @@ SHELL=/bin/sh
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/pi/raspberry/bitcoin-audit
 LOG=/var/log/bitcoinaudit-cron.log
+TZ=Europe/Zurich
 
-# --- Daily audit post (09:00) ---------------------------------------------
-0 9 * * *  pi  cd $HOME && .venv/bin/python -m audit >> $LOG 2>&1
+# --- Daily audit post (00:00 Swiss time) ----------------------------------
+0 0 * * *  pi  cd $HOME && .venv/bin/python -m audit >> $LOG 2>&1
