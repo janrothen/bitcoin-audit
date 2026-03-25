@@ -47,3 +47,15 @@ def test_block_height_increase():
 def test_mined_percentage():
     creator = PostCreator(0, Decimal("19243704.10556611"), 0, Decimal("0"))
     assert creator.mined_percentage() == "91.63"
+
+
+def test_create_post_raises_on_negative_block_delta():
+    creator = PostCreator(941878, Decimal("20006091.78041419"), 942022, Decimal("20005248.03041419"))
+    with pytest.raises(ValueError, match="Block height decreased"):
+        creator.create_post()
+
+
+def test_create_post_raises_on_negative_total_delta():
+    creator = PostCreator(942022, Decimal("20005248.03041419"), 941878, Decimal("20006091.78041419"))
+    with pytest.raises(ValueError, match="Total supply decreased"):
+        creator.create_post()
