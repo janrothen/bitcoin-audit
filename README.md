@@ -67,8 +67,17 @@ Restart Bitcoin Core after editing `bitcoin.conf`.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e .
 python -m audit
+```
+
+> **Note:** The first run saves state only — no post is made. The first post happens on the second run. See [State file](#state-file) for details.
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest
 ```
 
 ## Run as a cron job (daily at midnight, Swiss time)
