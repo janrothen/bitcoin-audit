@@ -7,9 +7,9 @@ name = "bitcoin-audit"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    "python-bitcoinrpc",
-    "python-dotenv",
-    "tweepy>=4.0",
+    "python-bitcoinrpc~=1.0",
+    "python-dotenv~=1.2",
+    "tweepy~=4.16",
 ]
 
 [project.optional-dependencies]
