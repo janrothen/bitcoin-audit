@@ -18,7 +18,8 @@ src/audit/
         bitcoin_client.py  # connects to local Bitcoin node via RPC
         x_client.py        # posts to X via tweepy v2
 tests/
-config.toml              # runtime config (fill in credentials)
+config.toml              # runtime config (non-secret settings)
+.env                     # credentials/secrets (not committed)
 state.json               # persists previous block height + total
 pyproject.toml
 ```
@@ -36,7 +37,6 @@ pytest
 python -m audit
 ```
 
-## Cron (daily at midnight)
-```
-0 9 * * * cd /path/to/bitcoin-audit && .venv/bin/python -m audit
-```
+## Cron (daily at midnight, Europe/Zurich)
+See `etc/cron.d/bitcoinaudit` — copy it to `/etc/cron.d/` on the Pi.
+The cron file sets `TZ=Europe/Zurich`, so `0 0 * * *` fires at Swiss midnight.

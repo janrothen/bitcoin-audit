@@ -4,6 +4,13 @@ Posts the current Bitcoin block height and circulating supply once a day at midn
 
 ## Configuration
 
+Configuration is split across two files intentionally:
+
+- **`.env`** — secrets (credentials). Never commit this file.
+- **`config.toml`** — non-secret settings (IP, port, timeouts, file paths).
+
+### Credentials (`.env`)
+
 Copy `.env.example` to `.env` and fill in your credentials:
 
 ```bash
@@ -22,11 +29,13 @@ X_ACCESS_TOKEN_SECRET=...
 
 X credentials are obtained from the [X Developer Portal](https://console.x.com/). Create a project and app there, then generate the consumer keys and access tokens with read/write permissions.
 
+### Settings (`config.toml`)
+
 Edit `config.toml` to customise the behaviour (the `state` section controls where the state file is stored — see [State file](#state-file) below):
 
 ```toml
 [bitcoin.rpc]
-ip      = "192.168.2.100"
+ip      = "192.168.x.x"   # IP of your Bitcoin Core node
 port    = 8332
 timeout = 900
 
@@ -37,8 +46,21 @@ file = "state.json"
 ## Requirements
 
 - Raspberry Pi (tested on Pi 4, 8 GB RAM)
-- Running Bitcoin Core node (local RPC access)
+- Running Bitcoin Core node with RPC enabled
 - Python 3.13+
+
+### Bitcoin Core RPC setup
+
+The bot connects to your node over RPC. Your `bitcoin.conf` must allow connections from the Pi's IP:
+
+```ini
+rpcuser=your_rpc_username
+rpcpassword=your_rpc_password
+rpcbind=0.0.0.0          # or the specific interface IP
+rpcallowip=192.168.x.x   # IP of the Pi running this bot
+```
+
+Restart Bitcoin Core after editing `bitcoin.conf`.
 
 ## Install & run
 
@@ -49,7 +71,7 @@ pip install -e ".[dev]"
 python -m audit
 ```
 
-## Run as a cron job (daily at midnight)
+## Run as a cron job (daily at midnight, Swiss time)
 
 ```bash
 # Install the cron file
