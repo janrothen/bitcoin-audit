@@ -19,7 +19,7 @@ src/audit/
         x_client.py        # posts to X via tweepy v2
 tests/
 config.toml              # runtime config (fill in credentials)
-state.json               # persists yesterday's block height + total
+state.json               # persists previous block height + total
 pyproject.toml
 ```
 

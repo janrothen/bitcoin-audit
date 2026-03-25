@@ -1,4 +1,5 @@
 import argparse
+import logging
 from decimal import Decimal
 
 from audit.audit_bot import AuditBot
@@ -12,6 +13,12 @@ class _MockBitcoinClient:
 
     def get_total_amount(self):
         return Decimal("20006091.78041419")
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 
 def main():
