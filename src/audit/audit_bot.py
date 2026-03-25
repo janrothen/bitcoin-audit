@@ -1,9 +1,12 @@
 import json
+import logging
 from decimal import Decimal
 from pathlib import Path
 
 from audit.config import config, project_root
 from audit.post_creator import PostCreator
+
+logger = logging.getLogger(__name__)
 
 _state_path = project_root() / config()["state"]["file"]
 
@@ -15,10 +18,14 @@ class AuditBot:
         self.state_file = Path(state_file) if state_file else _state_path
 
     def run(self):
-        self._fetch_current()
-        self._fetch_previous()
-        self._post()
-        self._save_state()
+        try:
+            self._fetch_current()
+            self._fetch_previous()
+            self._post()
+            self._save_state()
+        except Exception:
+            logger.exception("Audit run failed")
+            raise
 
     def _fetch_current(self):
         self.current_block_height = self.bitcoin_client.get_block_height()
@@ -38,6 +45,7 @@ class AuditBot:
         )
         self.post = creator.create_post()
         self.x_client.post(self.post)
+        logger.info("Posted:\n%s", self.post)
 
     def _save_state(self):
         state = {
