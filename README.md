@@ -22,7 +22,7 @@ X_ACCESS_TOKEN_SECRET=...
 
 X credentials are obtained from the [X Developer Portal](https://console.x.com/). Create a project and app there, then generate the consumer keys and access tokens with read/write permissions.
 
-Edit `config.toml` to customise the behaviour:
+Edit `config.toml` to customise the behaviour (the `state` section controls where the state file is stored — see [State file](#state-file) below):
 
 ```toml
 [bitcoin.rpc]
@@ -69,3 +69,11 @@ To follow logs:
 ```bash
 tail -f /var/log/bitcoinaudit-cron.log
 ```
+
+## State file
+
+`state.json` persists the block height and circulating supply from the previous run. It is used to calculate the delta shown in each post.
+
+The file is created automatically on first run — no post is made that time, since there is no previous state to compare against. The second run proceeds normally.
+
+If the file is deleted, the bot bootstraps itself again on the next run.
