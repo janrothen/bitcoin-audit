@@ -20,9 +20,12 @@ class AuditBot:
     def run(self):
         try:
             self._fetch_current()
-            self._fetch_previous()
-            self._post()
-            self._save_state()
+            bootstrapped = self._fetch_previous()
+            if bootstrapped:
+                self._save_state()
+            else:
+                self._post()
+                self._save_state()
         except Exception:
             logger.exception("Audit run failed")
             raise
@@ -32,9 +35,19 @@ class AuditBot:
         self.current_total = self.bitcoin_client.get_total_amount()
 
     def _fetch_previous(self):
-        state = json.loads(self.state_file.read_text())
+        """Load previous state. Returns True if bootstrapping (no state file existed)."""
+        try:
+            state = json.loads(self.state_file.read_text())
+        except FileNotFoundError:
+            logger.warning(
+                "No state file found at %s — bootstrapping. "
+                "Current state saved; post will be made on next run.",
+                self.state_file,
+            )
+            return True
         self.previous_block_height = state["block_height"]
         self.previous_total = Decimal(state["total"])
+        return False
 
     def _post(self):
         creator = PostCreator(
