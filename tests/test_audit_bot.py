@@ -5,6 +5,7 @@ from audit.audit_bot import AuditBot
 
 EXPECTED_POST = """\
 #Bitcoin block 942022
+
 Δ since block 941878:
 +144 blocks
 +843.75000000 BTC
