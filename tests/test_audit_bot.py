@@ -31,3 +31,16 @@ def test_bot_posts_and_saves_state(bitcoin_client, x_client, tmp_path):
     saved = json.loads(state_file.read_text())
     assert saved["block_height"] == 942022
     assert saved["total"] == "20006091.78041419"
+
+
+def test_bot_bootstraps_when_no_state_file(bitcoin_client, x_client, tmp_path):
+    state_file = tmp_path / "state.json"  # intentionally not created
+
+    bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
+    bot.run()
+
+    assert x_client.posted is None  # no post on first run
+
+    saved = json.loads(state_file.read_text())
+    assert saved["block_height"] == 942022
+    assert saved["total"] == "20006091.78041419"
