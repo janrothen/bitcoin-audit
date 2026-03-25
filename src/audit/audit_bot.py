@@ -16,7 +16,7 @@ class AuditBot:
 
     def run(self):
         self._fetch_current()
-        self._fetch_yesterday()
+        self._fetch_previous()
         self._post()
         self._save_state()
 
@@ -24,17 +24,17 @@ class AuditBot:
         self.current_block_height = self.bitcoin_client.get_block_height()
         self.current_total = self.bitcoin_client.get_total_amount()
 
-    def _fetch_yesterday(self):
+    def _fetch_previous(self):
         state = json.loads(self.state_file.read_text())
-        self.yesterdays_block_height = state["block_height"]
-        self.yesterdays_total = Decimal(state["total"])
+        self.previous_block_height = state["block_height"]
+        self.previous_total = Decimal(state["total"])
 
     def _post(self):
         creator = PostCreator(
             self.current_block_height,
             self.current_total,
-            self.yesterdays_block_height,
-            self.yesterdays_total,
+            self.previous_block_height,
+            self.previous_total,
         )
         self.post = creator.create_post()
         self.x_client.post(self.post)
