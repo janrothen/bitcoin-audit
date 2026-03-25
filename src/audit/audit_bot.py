@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from decimal import Decimal
 from pathlib import Path
 
@@ -65,4 +66,9 @@ class AuditBot:
             "block_height": self.current_block_height,
             "total": str(self.current_total),
         }
-        self.state_file.write_text(json.dumps(state))
+        # Write to a temp file first, then atomically replace the real state file.
+        # os.replace() is POSIX-atomic: the old file is never left partially overwritten,
+        # so a crash or disk-full error between post and save can't corrupt state.json.
+        tmp = self.state_file.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state))
+        os.replace(tmp, self.state_file)
