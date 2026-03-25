@@ -3,6 +3,11 @@ from decimal import Decimal, ROUND_DOWN
 THEORETICAL_MAX = Decimal("20999999.97690000")
 
 
+def _format_btc(amount: Decimal) -> str:
+    """Format a BTC amount with comma thousands separator and 8 decimal places."""
+    return f"{amount:,.8f}"
+
+
 class PostCreator:
     def __init__(self, height_current, total_current, height_previous, total_previous):
         self.height_current = height_current
@@ -17,8 +22,7 @@ class PostCreator:
         return self.total_current - self.total_previous
 
     def total_increase_since_previous_formatted(self):
-        total = self.total_increase_since_previous()
-        return f"{total:,.8f}"
+        return _format_btc(self.total_increase_since_previous())
 
     def mined_percentage(self):
         pct = (self.total_current / THEORETICAL_MAX * 100).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
@@ -36,7 +40,7 @@ class PostCreator:
         return _TEMPLATE.format(
             height=self.height_current,
             height_previous=self.height_previous,
-            total=f"{self.total_current:,.8f}",
+            total=_format_btc(self.total_current),
             increase_blocks=f"{self.block_height_increase_since_previous():,}",
             increase_total=self.total_increase_since_previous_formatted(),
             mined=self.mined_percentage(),
