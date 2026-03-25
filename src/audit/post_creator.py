@@ -4,20 +4,20 @@ THEORETICAL_MAX = Decimal("20999999.97690000")
 
 
 class PostCreator:
-    def __init__(self, height_current, total_current, height_yesterday, total_yesterday):
+    def __init__(self, height_current, total_current, height_previous, total_previous):
         self.height_current = height_current
-        self.height_yesterday = height_yesterday
+        self.height_previous = height_previous
         self.total_current = total_current
-        self.total_yesterday = total_yesterday
+        self.total_previous = total_previous
 
-    def block_height_increase_since_yesterday(self):
-        return self.height_current - self.height_yesterday
+    def block_height_increase_since_previous(self):
+        return self.height_current - self.height_previous
 
-    def total_increase_since_yesterday(self):
-        return self.total_current - self.total_yesterday
+    def total_increase_since_previous(self):
+        return self.total_current - self.total_previous
 
-    def total_increase_since_yesterday_formatted(self):
-        total = self.total_increase_since_yesterday()
+    def total_increase_since_previous_formatted(self):
+        total = self.total_increase_since_previous()
         return f"{total:,.8f}"
 
     def mined_percentage(self):
@@ -27,17 +27,18 @@ class PostCreator:
     def create_post(self):
         return _TEMPLATE.format(
             height=self.height_current,
-            height_yesterday=self.height_yesterday,
+            height_previous=self.height_previous,
             total=f"{self.total_current:,.8f}",
-            increase_blocks=f"{self.block_height_increase_since_yesterday():,}",
-            increase_total=self.total_increase_since_yesterday_formatted(),
+            increase_blocks=f"{self.block_height_increase_since_previous():,}",
+            increase_total=self.total_increase_since_previous_formatted(),
             mined=self.mined_percentage(),
         )
 
 
 _TEMPLATE = """\
 #Bitcoin block {height}
-Δ since block {height_yesterday}:
+
+Δ since block {height_previous}:
 +{increase_blocks} blocks
 +{increase_total} BTC
 
