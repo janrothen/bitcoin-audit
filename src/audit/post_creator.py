@@ -30,9 +30,11 @@ class PostCreator:
 
 
 _TEMPLATE = """\
+Downtime over. Resuming scheduled audits.
+
 #Bitcoin block {height}
 
-Increase since yesterday:
+Since last audit:
 +{increase_blocks} blocks
 +{increase_total} BTC
 
