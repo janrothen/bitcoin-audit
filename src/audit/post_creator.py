@@ -25,6 +25,14 @@ class PostCreator:
         return f"{pct}"
 
     def create_post(self):
+        if self.block_height_increase_since_previous() < 0:
+            raise ValueError(
+                f"Block height decreased: {self.height_previous} -> {self.height_current}"
+            )
+        if self.total_increase_since_previous() < 0:
+            raise ValueError(
+                f"Total supply decreased: {self.total_previous} -> {self.total_current}"
+            )
         return _TEMPLATE.format(
             height=self.height_current,
             height_previous=self.height_previous,
