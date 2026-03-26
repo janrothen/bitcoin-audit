@@ -11,13 +11,11 @@ sequenceDiagram
     participant Bitcoin Core RPC
     participant X API
 
-    Cron->>AuditBot: python -m audit (daily midnight)
-    AuditBot->>Bitcoin Core RPC: getblockcount
-    Bitcoin Core RPC-->>AuditBot: block height
+    Cron->>AuditBot: python -m audit
     AuditBot->>Bitcoin Core RPC: gettxoutsetinfo
-    Bitcoin Core RPC-->>AuditBot: total supply
+    Bitcoin Core RPC-->>AuditBot: block height & total supply
     AuditBot->>AuditBot: load state.json (previous snapshot)
-    AuditBot->>AuditBot: format post (delta, %, supply)
+    AuditBot->>AuditBot: format post (delta, supply, %)
     AuditBot->>X API: post tweet
     X API-->>AuditBot: 201 Created
     AuditBot->>AuditBot: save state.json (atomic)
