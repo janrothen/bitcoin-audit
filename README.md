@@ -2,6 +2,27 @@
 
 Posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)) via cron.
 
+## Architecture
+
+```mermaid
+sequenceDiagram
+    participant Cron
+    participant AuditBot
+    participant Bitcoin Core RPC
+    participant X API
+
+    Cron->>AuditBot: python -m audit (daily midnight)
+    AuditBot->>Bitcoin Core RPC: getblockcount
+    Bitcoin Core RPC-->>AuditBot: block height
+    AuditBot->>Bitcoin Core RPC: gettxoutsetinfo
+    Bitcoin Core RPC-->>AuditBot: total supply
+    AuditBot->>AuditBot: load state.json (previous snapshot)
+    AuditBot->>AuditBot: format post (delta, %, supply)
+    AuditBot->>X API: post tweet
+    X API-->>AuditBot: 201 Created
+    AuditBot->>AuditBot: save state.json (atomic)
+```
+
 ## Configuration
 
 Configuration is split across two files intentionally:
