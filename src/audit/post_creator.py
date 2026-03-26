@@ -67,7 +67,6 @@ _TEMPLATE = """\
 +{increase_blocks} blocks
 +{increase_total} BTC
 
-Total supply:    {total} BTC
-Theoretical max: 20,999,999.97690000 BTC
-Mined:           {mined}% of max supply\
+Total supply: {total} BTC
+Mined: {mined}% of max supply\
 """
