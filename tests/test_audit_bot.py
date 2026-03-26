@@ -12,9 +12,8 @@ EXPECTED_POST = """\
 +144 blocks
 +843.75000000 BTC
 
-Total supply:    20,006,091.78041419 BTC
-Theoretical max: 20,999,999.97690000 BTC
-Mined:           95.26% of max supply\
+Total supply: 20,006,091.78041419 BTC
+Mined: 95.26% of max supply\
 """
 
 
