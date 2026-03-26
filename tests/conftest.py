@@ -1,5 +1,9 @@
-import pytest
 from decimal import Decimal
+from typing import override
+
+import pytest
+
+from audit.protocols import BitcoinClientProtocol, XClientProtocol
 
 
 @pytest.fixture(autouse=True)
@@ -12,27 +16,30 @@ def env_vars(monkeypatch):
     monkeypatch.setenv("X_ACCESS_TOKEN_SECRET", "test_access_token_secret")
 
 
-class MockBitcoinClient:
-    def get_block_height(self):
+class MockBitcoinClient(BitcoinClientProtocol):
+    @override
+    def get_block_height(self) -> int:
         return 942022
 
-    def get_total_amount(self):
+    @override
+    def get_total_amount(self) -> Decimal:
         return Decimal("20006091.78041419")
 
 
-class MockXClient:
-    def __init__(self):
-        self.posted = None
+class MockXClient(XClientProtocol):
+    def __init__(self) -> None:
+        self.posted: str | None = None
 
-    def post(self, text):
+    @override
+    def post(self, text: str) -> None:
         self.posted = text
 
 
 @pytest.fixture
-def bitcoin_client():
+def bitcoin_client() -> MockBitcoinClient:
     return MockBitcoinClient()
 
 
 @pytest.fixture
-def x_client():
+def x_client() -> MockXClient:
     return MockXClient()
