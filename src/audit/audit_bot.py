@@ -6,6 +6,7 @@ from pathlib import Path
 
 from audit.config import config, project_root
 from audit.post_creator import PostCreator
+from audit.protocols import BitcoinClientProtocol, XClientProtocol
 
 logger = logging.getLogger(__name__)
 
@@ -13,12 +14,23 @@ _state_path = project_root() / config()["state"]["file"]
 
 
 class AuditBot:
-    def __init__(self, bitcoin_client, x_client, state_file=None):
+    current_block_height: int
+    current_total: Decimal
+    previous_block_height: int
+    previous_total: Decimal
+    post: str
+
+    def __init__(
+        self,
+        bitcoin_client: BitcoinClientProtocol,
+        x_client: XClientProtocol,
+        state_file: Path | str | None = None,
+    ) -> None:
         self.bitcoin_client = bitcoin_client
         self.x_client = x_client
         self.state_file = Path(state_file) if state_file else _state_path
 
-    def run(self):
+    def run(self) -> None:
         try:
             self._fetch_current()
             bootstrapped = self._fetch_previous()
@@ -31,11 +43,11 @@ class AuditBot:
             logger.exception("Audit run failed")
             raise
 
-    def _fetch_current(self):
+    def _fetch_current(self) -> None:
         self.current_block_height = self.bitcoin_client.get_block_height()
         self.current_total = self.bitcoin_client.get_total_amount()
 
-    def _fetch_previous(self):
+    def _fetch_previous(self) -> bool:
         """Load previous state. Returns True if bootstrapping (no state file existed)."""
         try:
             state = json.loads(self.state_file.read_text())
@@ -50,7 +62,7 @@ class AuditBot:
         self.previous_total = Decimal(state["total"])
         return False
 
-    def _post(self):
+    def _post(self) -> None:
         creator = PostCreator(
             self.current_block_height,
             self.current_total,
@@ -61,7 +73,7 @@ class AuditBot:
         self.x_client.post(self.post)
         logger.info("Posted:\n%s", self.post)
 
-    def _save_state(self):
+    def _save_state(self) -> None:
         state = {
             "block_height": self.current_block_height,
             "total": str(self.current_total),

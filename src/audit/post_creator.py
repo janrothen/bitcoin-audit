@@ -1,34 +1,47 @@
 from decimal import Decimal, ROUND_DOWN
 
-THEORETICAL_MAX = Decimal("20999999.97690000")
+type BTCAmount = Decimal
+
+THEORETICAL_MAX: BTCAmount = Decimal("20999999.97690000")
 
 
-def _format_btc(amount: Decimal) -> str:
+def _format_btc(amount: BTCAmount) -> str:
     """Format a BTC amount with comma thousands separator and 8 decimal places."""
     return f"{amount:,.8f}"
 
 
 class PostCreator:
-    def __init__(self, height_current, total_current, height_previous, total_previous):
+    height_current: int
+    height_previous: int
+    total_current: BTCAmount
+    total_previous: BTCAmount
+
+    def __init__(
+        self,
+        height_current: int,
+        total_current: BTCAmount,
+        height_previous: int,
+        total_previous: BTCAmount,
+    ) -> None:
         self.height_current = height_current
         self.height_previous = height_previous
         self.total_current = total_current
         self.total_previous = total_previous
 
-    def block_height_increase_since_previous(self):
+    def block_height_increase_since_previous(self) -> int:
         return self.height_current - self.height_previous
 
-    def total_increase_since_previous(self):
+    def total_increase_since_previous(self) -> BTCAmount:
         return self.total_current - self.total_previous
 
-    def total_increase_since_previous_formatted(self):
+    def total_increase_since_previous_formatted(self) -> str:
         return _format_btc(self.total_increase_since_previous())
 
-    def mined_percentage(self):
+    def mined_percentage(self) -> str:
         pct = (self.total_current / THEORETICAL_MAX * 100).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
         return f"{pct}"
 
-    def create_post(self):
+    def create_post(self) -> str:
         if self.block_height_increase_since_previous() < 0:
             raise ValueError(
                 f"Block height decreased: {self.height_previous} -> {self.height_current}"
