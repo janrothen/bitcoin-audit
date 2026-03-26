@@ -11,6 +11,13 @@ def _format_btc(amount: BTCAmount) -> str:
 
 
 class PostCreator:
+    """Composes the text for a daily Bitcoin audit post.
+
+    Given the current and previous block height and circulating supply,
+    calculates the deltas and formats them into a ready-to-post string.
+    Raises ValueError if the block height or total supply would decrease
+    between runs, which indicates corrupt or out-of-order state.
+    """
     height_current: int
     height_previous: int
     total_current: BTCAmount

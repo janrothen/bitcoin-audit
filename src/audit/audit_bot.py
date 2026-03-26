@@ -14,6 +14,15 @@ _state_path = project_root() / config()["state"]["file"]
 
 
 class AuditBot:
+    """Orchestrates the daily Bitcoin audit run.
+
+    Fetches the current block height and circulating supply from a Bitcoin node,
+    compares them against the previous run's snapshot, posts the delta to X,
+    and persists the new snapshot to state.json.
+
+    On first run (no state file), it bootstraps by saving the current state
+    without posting — the first post is made on the second run.
+    """
     current_block_height: int
     current_total: Decimal
     previous_block_height: int
