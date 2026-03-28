@@ -80,7 +80,7 @@ class AuditBot:
         )
         self.post = creator.create_post()
         self.x_client.post(self.post)
-        logger.info("Posted:\n%s", self.post)
+        logger.info("Post created on X (block %d)", self.current_block_height)
 
     def _save_state(self) -> None:
         state = {

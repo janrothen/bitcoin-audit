@@ -1,6 +1,30 @@
 # Bitcoin Audit
 
-Posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)) via cron.
+A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
+
+![Python](https://img.shields.io/badge/python-3.13%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## Requirements
+
+- Raspberry Pi 4 (8 GB RAM recommended)
+- Bitcoin Core node with RPC enabled and fully synced
+- X developer account with read/write app credentials
+- Python 3.13+
+- Dependencies: `python-bitcoinrpc`, `python-dotenv`, `tweepy`
+
+### Bitcoin Core RPC setup
+
+The bot connects to your node over RPC. Your `bitcoin.conf` must allow connections from the Pi's IP:
+
+```ini
+rpcuser=your_rpc_username
+rpcpassword=your_rpc_password
+rpcbind=0.0.0.0          # or the specific interface IP
+rpcallowip=192.168.x.x   # IP of the Pi running this bot
+```
+
+Restart Bitcoin Core after editing `bitcoin.conf`.
 
 ## Architecture
 
@@ -20,6 +44,8 @@ sequenceDiagram
     X API-->>AuditBot: 201 Created
     AuditBot->>AuditBot: save state.json (atomic)
 ```
+
+![Example post](assets/post.png)
 
 ## Configuration
 
@@ -62,29 +88,10 @@ timeout = 900
 file = "state.json"
 ```
 
-## Requirements
-
-- Raspberry Pi (tested on Pi 4, 8 GB RAM)
-- Running Bitcoin Core node with RPC enabled
-- Python 3.13+
-
-### Bitcoin Core RPC setup
-
-The bot connects to your node over RPC. Your `bitcoin.conf` must allow connections from the Pi's IP:
-
-```ini
-rpcuser=your_rpc_username
-rpcpassword=your_rpc_password
-rpcbind=0.0.0.0          # or the specific interface IP
-rpcallowip=192.168.x.x   # IP of the Pi running this bot
-```
-
-Restart Bitcoin Core after editing `bitcoin.conf`.
-
 ## Install & run
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 python -m audit
@@ -99,26 +106,42 @@ pip install -e ".[dev]"
 pytest
 ```
 
-## Run as a cron job (daily at midnight, Swiss time)
+Tests use mock implementations of `BitcoinClientProtocol` and `XClientProtocol` (see `tests/conftest.py`), so no live node or X account is needed to run the test suite.
+
+## Deployment
+
+Copy the cron file to the Pi and set the correct ownership and permissions:
 
 ```bash
-# Install the cron file
 sudo cp etc/cron.d/bitcoinaudit /etc/cron.d/
 sudo chmod 644 /etc/cron.d/bitcoinaudit
 sudo chown root:root /etc/cron.d/bitcoinaudit
+```
 
-# Create the log file (cron runs as user pi)
+Create the log file (cron runs as user `pi`):
+
+```bash
 sudo touch /var/log/bitcoinaudit-cron.log
 sudo chown pi:pi /var/log/bitcoinaudit-cron.log
-
-# Verify cron picked it up
-sudo systemctl status cron
 ```
 
-To follow logs:
+The cron file sets `TZ=Europe/Zurich`, so `0 0 * * *` fires at Swiss midnight. Verify cron picked it up:
+
 ```bash
+sudo systemctl status cron
 tail -f /var/log/bitcoinaudit-cron.log
 ```
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| `ConnectionRefusedError` on RPC call | Bitcoin Core is not running, or `rpcbind`/`rpcallowip` not set correctly in `bitcoin.conf` |
+| `401 Unauthorized` from RPC | `BITCOIN_RPC_USER` or `BITCOIN_RPC_PASSWORD` in `.env` does not match `bitcoin.conf` |
+| `403 Forbidden` from X API | App does not have write permissions — regenerate tokens after enabling read/write in the Developer Portal |
+| No post on first run | Expected — the bot bootstraps `state.json` on the first run and posts from the second run onwards |
+| Bot not running at midnight | Check `sudo systemctl status cron` and confirm the log file is writable by `pi` |
+| `gettxoutsetinfo` times out | The RPC call scans the UTXO set and is slow; increase `timeout` in `config.toml` |
 
 ## State file
 
@@ -127,3 +150,14 @@ tail -f /var/log/bitcoinaudit-cron.log
 The file is created automatically on first run — no post is made that time, since there is no previous state to compare against. The second run proceeds normally.
 
 If the file is deleted, the bot bootstraps itself again on the next run.
+
+## Security
+
+- Never commit `.env` — it is listed in `.gitignore`.
+- Never commit `state.json` — it is local runtime state.
+- RPC credentials in `bitcoin.conf` should match `.env` exactly; restrict `rpcallowip` to the Pi's IP only.
+- X access tokens grant write access to the account — treat them as passwords.
+
+## License
+
+MIT

@@ -18,6 +18,8 @@ src/audit/
         bitcoin_client.py  # connects to local Bitcoin node via RPC
         x_client.py        # posts to X via tweepy v2
 tests/
+assets/
+    post.png             # example X post (used in README)
 config.toml              # runtime config (non-secret settings)
 .env                     # credentials/secrets (not committed)
 state.json               # persists previous block height + total
