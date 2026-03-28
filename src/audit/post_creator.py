@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_DOWN
+from decimal import ROUND_DOWN, Decimal
 
 type BTCAmount = Decimal
 
@@ -18,6 +18,7 @@ class PostCreator:
     Raises ValueError if the block height or total supply would decrease
     between runs, which indicates corrupt or out-of-order state.
     """
+
     height_current: int
     height_previous: int
     total_current: BTCAmount
@@ -45,7 +46,9 @@ class PostCreator:
         return _format_btc(self.total_increase_since_previous())
 
     def mined_percentage(self) -> str:
-        pct = (self.total_current / THEORETICAL_MAX * 100).quantize(Decimal("0.01"), rounding=ROUND_DOWN)
+        pct = (self.total_current / THEORETICAL_MAX * 100).quantize(
+            Decimal("0.01"), rounding=ROUND_DOWN
+        )
         return f"{pct}"
 
     def create_post(self) -> str:

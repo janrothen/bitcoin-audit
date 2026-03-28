@@ -23,6 +23,7 @@ class AuditBot:
     On first run (no state file), it bootstraps by saving the current state
     without posting — the first post is made on the second run.
     """
+
     current_block_height: int
     current_total: Decimal
     previous_block_height: int

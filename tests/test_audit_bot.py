@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 
 import pytest
 
@@ -19,10 +18,14 @@ Mined: 95.26% of max supply\
 
 def test_bot_posts_and_saves_state(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
-    state_file.write_text(json.dumps({
-        "block_height": 941878,
-        "total": "20005248.03041419",
-    }))
+    state_file.write_text(
+        json.dumps(
+            {
+                "block_height": 941878,
+                "total": "20005248.03041419",
+            }
+        )
+    )
 
     bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
     bot.run()
@@ -63,7 +66,9 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
 
 def test_no_tmp_file_left_after_successful_run(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
-    state_file.write_text(json.dumps({"block_height": 941878, "total": "20005248.03041419"}))
+    state_file.write_text(
+        json.dumps({"block_height": 941878, "total": "20005248.03041419"})
+    )
 
     bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
     bot.run()
