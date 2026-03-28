@@ -1,10 +1,10 @@
 # Bitcoin Audit
 
-A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
-
 ![Python](https://img.shields.io/badge/python-3.13%2B-blue)
 ![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%20%7C%20Linux-lightgrey.svg)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
 
 ## Requirements
 
