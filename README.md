@@ -3,6 +3,7 @@
 A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
 
 ![Python](https://img.shields.io/badge/python-3.13%2B-blue)
+![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%20%7C%20Linux-lightgrey.svg)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Requirements
@@ -158,6 +159,11 @@ If the file is deleted, the bot bootstraps itself again on the next run.
 - RPC credentials in `bitcoin.conf` should match `.env` exactly; restrict `rpcallowip` to the Pi's IP only.
 - X access tokens grant write access to the account — treat them as passwords.
 
+## Contributing
+
+Found a bug or have an idea? Open an issue or send a PR.
+Run `pytest` before submitting and keep changes focused.
+
 ## License
 
-MIT
+MIT © Jan Rothen — see [LICENSE](LICENSE) for details.
