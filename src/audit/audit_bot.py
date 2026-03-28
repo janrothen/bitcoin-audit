@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from audit.config import config, project_root
@@ -26,9 +26,9 @@ class AuditBot:
 
     current_block_height: int
     current_total: Decimal
-    previous_block_height: int
-    previous_total: Decimal
-    post: str
+    previous_block_height: int | None
+    previous_total: Decimal | None
+    post: str | None
 
     def __init__(
         self,
@@ -39,6 +39,9 @@ class AuditBot:
         self.bitcoin_client = bitcoin_client
         self.x_client = x_client
         self.state_file = Path(state_file) if state_file else _state_path
+        self.previous_block_height = None
+        self.previous_total = None
+        self.post = None
 
     def run(self) -> None:
         try:
@@ -61,6 +64,8 @@ class AuditBot:
         """Load previous state. Returns True if bootstrapping (no state file existed)."""
         try:
             state = json.loads(self.state_file.read_text())
+            self.previous_block_height = state["block_height"]
+            self.previous_total = Decimal(state["total"])
         except FileNotFoundError:
             logger.warning(
                 "No state file found at %s — bootstrapping. "
@@ -68,8 +73,8 @@ class AuditBot:
                 self.state_file,
             )
             return True
-        self.previous_block_height = state["block_height"]
-        self.previous_total = Decimal(state["total"])
+        except (json.JSONDecodeError, KeyError, InvalidOperation) as e:
+            raise RuntimeError(f"Corrupt state file at {self.state_file}: {e}") from e
         return False
 
     def _post(self) -> None:
@@ -92,5 +97,9 @@ class AuditBot:
         # os.replace() is POSIX-atomic: the old file is never left partially overwritten,
         # so a crash or disk-full error between post and save can't corrupt state.json.
         tmp = self.state_file.with_suffix(".tmp")
-        tmp.write_text(json.dumps(state))
-        os.replace(tmp, self.state_file)
+        try:
+            tmp.write_text(json.dumps(state))
+            os.replace(tmp, self.state_file)
+        except Exception:
+            tmp.unlink(missing_ok=True)
+            raise
