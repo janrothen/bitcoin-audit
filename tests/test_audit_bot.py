@@ -64,6 +64,23 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     assert json.loads(state_file.read_text()) == original
 
 
+@pytest.mark.parametrize(
+    "content",
+    [
+        "not json",
+        '{"block_height": 941878}',  # missing "total" key
+        '{"block_height": 941878, "total": "not-a-decimal"}',
+    ],
+)
+def test_corrupt_state_file_raises(bitcoin_client, x_client, tmp_path, content):
+    state_file = tmp_path / "state.json"
+    state_file.write_text(content)
+
+    bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
+    with pytest.raises(RuntimeError, match="Corrupt state file"):
+        bot.run()
+
+
 def test_no_tmp_file_left_after_successful_run(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
     state_file.write_text(

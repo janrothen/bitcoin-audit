@@ -28,6 +28,6 @@ def project_root() -> Path:
 
 def env(key: str) -> str:
     value = os.environ.get(key)
-    if not value:
+    if value is None:
         raise RuntimeError(f"Missing required environment variable: {key}")
     return value
