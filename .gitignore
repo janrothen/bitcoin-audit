@@ -11,7 +11,7 @@ venv/
 .coverage
 *.log
 
-.claude/*
+.claude/settings.local.json
 .env
 .venv/
 state.json
