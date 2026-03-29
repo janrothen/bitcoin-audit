@@ -19,11 +19,11 @@ def env_vars(monkeypatch):
 class MockBitcoinClient(BitcoinClientProtocol):
     @override
     def get_block_height(self) -> int:
-        return 942022
+        return 942532
 
     @override
     def get_total_amount(self) -> Decimal:
-        return Decimal("20006091.78041419")
+        return Decimal("20007685.53030772")
 
 
 class MockXClient(XClientProtocol):

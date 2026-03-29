@@ -5,14 +5,14 @@ import pytest
 from audit.audit_bot import AuditBot
 
 EXPECTED_POST = """\
-#Bitcoin block 942022
+#Bitcoin block 942532
 
-Δ since block 941878:
-+144 blocks
-+843.75000000 BTC
+Δ since block 942377:
++155 blocks
++484.37498232 BTC
 
-Total supply: 20,006,091.78041419 BTC
-Mined: 95.26% of max supply\
+Total supply: 20,007,685.53030772 BTC
+Mined: 95.27% of max supply\
 """
 
 
@@ -21,8 +21,8 @@ def test_bot_posts_and_saves_state(bitcoin_client, x_client, tmp_path):
     state_file.write_text(
         json.dumps(
             {
-                "block_height": 941878,
-                "total": "20005248.03041419",
+                "block_height": 942377,
+                "total": "20007201.15532540",
             }
         )
     )
@@ -33,8 +33,8 @@ def test_bot_posts_and_saves_state(bitcoin_client, x_client, tmp_path):
     assert x_client.posted == EXPECTED_POST
 
     saved = json.loads(state_file.read_text())
-    assert saved["block_height"] == 942022
-    assert saved["total"] == "20006091.78041419"
+    assert saved["block_height"] == 942532
+    assert saved["total"] == "20007685.53030772"
 
 
 def test_bot_bootstraps_when_no_state_file(bitcoin_client, x_client, tmp_path):
@@ -46,13 +46,13 @@ def test_bot_bootstraps_when_no_state_file(bitcoin_client, x_client, tmp_path):
     assert x_client.posted is None  # no post on first run
 
     saved = json.loads(state_file.read_text())
-    assert saved["block_height"] == 942022
-    assert saved["total"] == "20006091.78041419"
+    assert saved["block_height"] == 942532
+    assert saved["total"] == "20007685.53030772"
 
 
 def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
-    original = {"block_height": 941878, "total": "20005248.03041419"}
+    original = {"block_height": 942377, "total": "20007201.15532540"}
     state_file.write_text(json.dumps(original))
 
     x_client.post = lambda text: (_ for _ in ()).throw(RuntimeError("X API error"))
@@ -68,8 +68,8 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     "content",
     [
         "not json",
-        '{"block_height": 941878}',  # missing "total" key
-        '{"block_height": 941878, "total": "not-a-decimal"}',
+        '{"block_height": 942377}',  # missing "total" key
+        '{"block_height": 942377, "total": "not-a-decimal"}',
     ],
 )
 def test_corrupt_state_file_raises(bitcoin_client, x_client, tmp_path, content):
@@ -84,7 +84,7 @@ def test_corrupt_state_file_raises(bitcoin_client, x_client, tmp_path, content):
 def test_no_tmp_file_left_after_successful_run(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
     state_file.write_text(
-        json.dumps({"block_height": 941878, "total": "20005248.03041419"})
+        json.dumps({"block_height": 942377, "total": "20007201.15532540"})
     )
 
     bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
