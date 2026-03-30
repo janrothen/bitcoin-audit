@@ -1,28 +1,32 @@
 # Automated Scheduling with Cron
 
-The project includes a cron file (`etc/cron.d/bitcoin-audit`) that runs the bot once a day at midnight.
+The project includes a cron file (`bitcoin-audit`) that runs the bot once a day at midnight.
 
 ## Installation steps
 
-### 1. Copy the scheduling file
+### 1. Set the repo path
+
+Update the `HOME` variable at the top of `bitcoin-node-watchdog` to match where you cloned the repo.
+
+### 2. Copy the scheduling file
 ```bash
-sudo cp etc/cron.d/bitcoin-audit /etc/cron.d/
+sudo cp bitcoin-audit /etc/cron.d/
 ```
 
-### 2. Set proper permissions
+### 3. Set proper permissions
 ```bash
 sudo chmod 644 /etc/cron.d/bitcoin-audit
 sudo chown root:root /etc/cron.d/bitcoin-audit
 ```
 
-### 3. Create the log file
+### 4. Create the log file
 The cron job runs as user `pi` which cannot create files in `/var/log/` by default:
 ```bash
 sudo touch /var/log/bitcoin-audit-cron.log
 sudo chown pi:pi /var/log/bitcoin-audit-cron.log
 ```
 
-### 4. Verify cron picked it up
+### 5. Verify cron picked it up
 ```bash
 sudo systemctl status cron
 ```
