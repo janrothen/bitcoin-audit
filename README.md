@@ -111,26 +111,21 @@ Tests use mock implementations of `BitcoinClientProtocol` and `XClientProtocol` 
 
 ## Deployment
 
-Copy the cron file to the Pi and set the correct ownership and permissions:
+Update the `HOME` variable at the top of `etc/cron.d/bitcoin-audit` to match where you cloned the repo, then:
 
 ```bash
-sudo cp etc/cron.d/bitcoinaudit /etc/cron.d/
-sudo chmod 644 /etc/cron.d/bitcoinaudit
-sudo chown root:root /etc/cron.d/bitcoinaudit
-```
+# Install the cron file
+sudo cp etc/cron.d/bitcoin-audit /etc/cron.d/
+sudo chmod 644 /etc/cron.d/bitcoin-audit
+sudo chown root:root /etc/cron.d/bitcoin-audit
 
-Create the log file (cron runs as user `pi`):
+# Create the log file (cron runs as user pi)
+sudo touch /var/log/bitcoin-audit-cron.log
+sudo chown pi:pi /var/log/bitcoin-audit-cron.log
 
-```bash
-sudo touch /var/log/bitcoinaudit-cron.log
-sudo chown pi:pi /var/log/bitcoinaudit-cron.log
-```
-
-The cron file sets `TZ=Europe/Zurich`, so `0 0 * * *` fires at Swiss midnight. Verify cron picked it up:
-
-```bash
+# Verify cron picked it up
 sudo systemctl status cron
-tail -f /var/log/bitcoinaudit-cron.log
+tail -f /var/log/bitcoin-audit-cron.log
 ```
 
 ## Troubleshooting
