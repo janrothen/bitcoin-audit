@@ -1,25 +1,25 @@
 # Automated Scheduling with Cron
 
-The project includes a cron file (`etc/cron.d/bitcoinaudit`) that runs the bot once a day at midnight.
+The project includes a cron file (`etc/cron.d/bitcoin-audit`) that runs the bot once a day at midnight.
 
 ## Installation steps
 
 ### 1. Copy the scheduling file
 ```bash
-sudo cp etc/cron.d/bitcoinaudit /etc/cron.d/
+sudo cp etc/cron.d/bitcoin-audit /etc/cron.d/
 ```
 
 ### 2. Set proper permissions
 ```bash
-sudo chmod 644 /etc/cron.d/bitcoinaudit
-sudo chown root:root /etc/cron.d/bitcoinaudit
+sudo chmod 644 /etc/cron.d/bitcoin-audit
+sudo chown root:root /etc/cron.d/bitcoin-audit
 ```
 
 ### 3. Create the log file
 The cron job runs as user `pi` which cannot create files in `/var/log/` by default:
 ```bash
-sudo touch /var/log/bitcoinaudit-cron.log
-sudo chown pi:pi /var/log/bitcoinaudit-cron.log
+sudo touch /var/log/bitcoin-audit-cron.log
+sudo chown pi:pi /var/log/bitcoin-audit-cron.log
 ```
 
 ### 4. Verify cron picked it up
@@ -29,7 +29,7 @@ sudo systemctl status cron
 
 ## Logs
 
-Output is appended to `/var/log/bitcoinaudit-cron.log`:
+Output is appended to `/var/log/bitcoin-audit-cron.log`:
 ```bash
-tail -f /var/log/bitcoinaudit-cron.log
+tail -f /var/log/bitcoin-audit-cron.log
 ```

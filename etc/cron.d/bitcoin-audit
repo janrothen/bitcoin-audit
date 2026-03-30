@@ -1,11 +1,11 @@
-# File: /etc/cron.d/bitcoinaudit
+# File: /etc/cron.d/bitcoin-audit
 # Purpose: Run the Bitcoin Audit bot once a day at midnight to post to @BitcoinAudit on X
 # Owner: root:root, Permissions: 644 (readable by root & cron daemon)
 
 SHELL=/bin/sh
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/pi/raspberry/bitcoin-audit
-LOG=/var/log/bitcoinaudit-cron.log
+LOG=/var/log/bitcoin-audit-cron.log
 TZ=Europe/Zurich
 
 # --- Daily audit post (00:00 Swiss time) ----------------------------------

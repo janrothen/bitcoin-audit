@@ -40,5 +40,5 @@ python -m audit
 ```
 
 ## Cron (daily at midnight, Europe/Zurich)
-See `etc/cron.d/bitcoinaudit` — copy it to `/etc/cron.d/` on the Pi.
+See `etc/cron.d/bitcoin-audit` — copy it to `/etc/cron.d/` on the Pi.
 The cron file sets `TZ=Europe/Zurich`, so `0 0 * * *` fires at Swiss midnight.
