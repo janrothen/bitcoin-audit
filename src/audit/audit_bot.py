@@ -10,8 +10,6 @@ from audit.protocols import BitcoinClientProtocol, XClientProtocol
 
 logger = logging.getLogger(__name__)
 
-_state_path = project_root() / config()["state"]["file"]
-
 
 class AuditBot:
     """Orchestrates the daily Bitcoin audit run.
@@ -24,12 +22,6 @@ class AuditBot:
     without posting — the first post is made on the second run.
     """
 
-    current_block_height: int
-    current_total: Decimal
-    previous_block_height: int | None
-    previous_total: Decimal | None
-    post: str | None
-
     def __init__(
         self,
         bitcoin_client: BitcoinClientProtocol,
@@ -38,10 +30,16 @@ class AuditBot:
     ) -> None:
         self.bitcoin_client = bitcoin_client
         self.x_client = x_client
-        self.state_file = Path(state_file) if state_file else _state_path
-        self.previous_block_height = None
-        self.previous_total = None
-        self.post = None
+        self.state_file = (
+            Path(state_file)
+            if state_file
+            else project_root() / config()["state"]["file"]
+        )
+        self.current_block_height: int | None = None
+        self.current_total: Decimal | None = None
+        self.previous_block_height: int | None = None
+        self.previous_total: Decimal | None = None
+        self.post: str | None = None
 
     def run(self) -> None:
         try:
