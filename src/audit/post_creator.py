@@ -15,14 +15,9 @@ class PostCreator:
 
     Given the current and previous block height and circulating supply,
     calculates the deltas and formats them into a ready-to-post string.
-    Raises ValueError if the block height or total supply would decrease
-    between runs, which indicates corrupt or out-of-order state.
+    Raises ValueError on construction if the block height or total supply
+    would decrease between runs, which indicates corrupt or out-of-order state.
     """
-
-    height_current: int
-    height_previous: int
-    total_current: BTCAmount
-    total_previous: BTCAmount
 
     def __init__(
         self,
@@ -31,6 +26,14 @@ class PostCreator:
         height_previous: int,
         total_previous: BTCAmount,
     ) -> None:
+        if height_current < height_previous:
+            raise ValueError(
+                f"Block height decreased: {height_previous} -> {height_current}"
+            )
+        if total_current < total_previous:
+            raise ValueError(
+                f"Total supply decreased: {total_previous} -> {total_current}"
+            )
         self.height_current = height_current
         self.height_previous = height_previous
         self.total_current = total_current
@@ -45,28 +48,20 @@ class PostCreator:
     def total_increase_since_previous_formatted(self) -> str:
         return _format_btc(self.total_increase_since_previous())
 
-    def mined_percentage(self) -> str:
+    def mined_percentage_formatted(self) -> str:
         pct = (self.total_current / THEORETICAL_MAX * 100).quantize(
             Decimal("0.01"), rounding=ROUND_DOWN
         )
         return f"{pct}"
 
     def create_post(self) -> str:
-        if self.block_height_increase_since_previous() < 0:
-            raise ValueError(
-                f"Block height decreased: {self.height_previous} -> {self.height_current}"
-            )
-        if self.total_increase_since_previous() < 0:
-            raise ValueError(
-                f"Total supply decreased: {self.total_previous} -> {self.total_current}"
-            )
         return _TEMPLATE.format(
             height=self.height_current,
             height_previous=self.height_previous,
             total=_format_btc(self.total_current),
             increase_blocks=f"{self.block_height_increase_since_previous():,}",
             increase_total=self.total_increase_since_previous_formatted(),
-            mined=self.mined_percentage(),
+            mined=self.mined_percentage_formatted(),
         )
 
 

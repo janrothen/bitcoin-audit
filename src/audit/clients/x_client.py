@@ -16,4 +16,6 @@ class XClient:
         )
 
     def post(self, text: str) -> None:
-        self._client.create_tweet(text=text)
+        response = self._client.create_tweet(text=text)
+        if response.errors:
+            raise RuntimeError(f"X API error: {response.errors}")

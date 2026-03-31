@@ -31,5 +31,7 @@ def test_get_total_amount(client):
 def test_rpc_called_once(client):
     bitcoin_client, mock_proxy = client
     bitcoin_client.get_block_height()
+    bitcoin_client.get_block_height()
+    bitcoin_client.get_total_amount()
     bitcoin_client.get_total_amount()
     mock_proxy.return_value.gettxoutsetinfo.assert_called_once()

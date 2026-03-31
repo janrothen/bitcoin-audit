@@ -1,5 +1,6 @@
 from decimal import Decimal
 from functools import cached_property
+from urllib.parse import quote
 
 from bitcoinrpc.authproxy import AuthServiceProxy
 
@@ -10,7 +11,9 @@ class BitcoinClient:
     @cached_property
     def _txoutsetinfo(self) -> dict:
         cfg = config()["bitcoin"]["rpc"]
-        url = f"http://{env('BITCOIN_RPC_USER')}:{env('BITCOIN_RPC_PASSWORD')}@{cfg['ip']}:{cfg['port']}"
+        user = quote(env("BITCOIN_RPC_USER"), safe="")
+        password = quote(env("BITCOIN_RPC_PASSWORD"), safe="")
+        url = f"http://{user}:{password}@{cfg['ip']}:{cfg['port']}"
         return AuthServiceProxy(url, timeout=cfg["timeout"]).gettxoutsetinfo()
 
     def get_block_height(self) -> int:
