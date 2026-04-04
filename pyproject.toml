@@ -25,7 +25,7 @@ packages = ["src/audit"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=src/epaper --cov-report=xml --cov-config=pyproject.toml"
+addopts = "--cov=src/audit --cov-report=xml --cov-config=pyproject.toml"
 
 [tool.coverage.run]
 relative_files = true
