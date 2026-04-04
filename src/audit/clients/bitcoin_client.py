@@ -13,7 +13,8 @@ class BitcoinClient:
         cfg = config()["bitcoin"]["rpc"]
         user = quote(env("BITCOIN_RPC_USER"), safe="")
         password = quote(env("BITCOIN_RPC_PASSWORD"), safe="")
-        url = f"http://{user}:{password}@{cfg['ip']}:{cfg['port']}"
+        scheme = cfg.get("scheme", "http")
+        url = f"{scheme}://{user}:{password}@{cfg['ip']}:{cfg['port']}"
         return AuthServiceProxy(url, timeout=cfg["timeout"]).gettxoutsetinfo()
 
     def get_block_height(self) -> int:

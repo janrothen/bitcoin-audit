@@ -2,6 +2,9 @@
 ip      = "192.168.2.100"
 port    = 8332
 timeout = 900
+# Use "https" if a TLS-terminating reverse proxy sits in front of the node.
+# Bitcoin Core's built-in RPC server does not support TLS natively.
+scheme  = "http"
 
 [state]
 file = "state.json"
