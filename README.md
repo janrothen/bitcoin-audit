@@ -3,10 +3,10 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi%20%7C%20Linux-lightgrey.svg)
 ![Python](https://img.shields.io/badge/python-3.13%2B-blue)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=janrothen_e-paper&metric=alert_status)](https://sonarcloud.io/project/overview?id=janrothen_e-paper)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=janrothen_e-paper&metric=bugs)](https://sonarcloud.io/project/overview?id=janrothen_e-paper)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=janrothen_e-paper&metric=coverage)](https://sonarcloud.io/project/overview?id=janrothen_e-paper)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=janrothen_e-paper&metric=security_rating)](https://sonarcloud.io/project/overview?id=janrothen_e-paper)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=alert_status)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=bugs)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=coverage)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=security_rating)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
 
 A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
 
