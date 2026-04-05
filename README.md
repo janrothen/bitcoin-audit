@@ -115,7 +115,7 @@ Tests use mock implementations of `BitcoinClientProtocol` and `XClientProtocol` 
 
 ## Deployment
 
-See [etc/cron.d/README.md](etc/cron.d/README.md) for installation steps.
+See [deploy/cron/README.md](deploy/cron/README.md) for installation steps.
 
 ## Troubleshooting
 
