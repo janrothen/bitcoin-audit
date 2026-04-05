@@ -20,6 +20,10 @@ src/audit/
 tests/
 assets/
     post.png             # example X post (used in README)
+deploy/
+    cron/
+        bitcoin-audit    # cron file — copy to /etc/cron.d/ on the Pi
+        README.md        # installation steps
 config.toml              # runtime config (non-secret settings)
 .env                     # credentials/secrets (not committed)
 state.json               # persists previous block height + total
