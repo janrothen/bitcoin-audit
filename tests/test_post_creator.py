@@ -50,7 +50,7 @@ def test_block_height_increase():
 
 def test_mined_percentage_formatted():
     creator = PostCreator(0, Decimal("19243704.10556611"), 0, Decimal("0"))
-    assert creator.mined_percentage_formatted() == "91.63"
+    assert creator.mined_percentage_formatted() == "91.63%"
 
 
 def test_raises_on_negative_block_delta():

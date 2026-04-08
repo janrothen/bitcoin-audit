@@ -52,7 +52,7 @@ class PostCreator:
         pct = (self.total_current / THEORETICAL_MAX * 100).quantize(
             Decimal("0.01"), rounding=ROUND_DOWN
         )
-        return f"{pct}"
+        return f"{pct}%"
 
     def create_post(self) -> str:
         return _TEMPLATE.format(
@@ -73,5 +73,5 @@ _TEMPLATE = """\
 +{increase_total} BTC
 
 Total supply: {total} BTC
-Mined: {mined}% of max supply\
+Mined: {mined} of max supply\
 """

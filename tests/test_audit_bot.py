@@ -55,7 +55,10 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     original = {"block_height": 942377, "total": "20007201.15532540"}
     state_file.write_text(json.dumps(original))
 
-    x_client.post = lambda text: (_ for _ in ()).throw(RuntimeError("X API error"))
+    def raise_error(text):
+        raise RuntimeError("X API error")
+
+    x_client.post = raise_error
 
     bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
     with pytest.raises(RuntimeError):
