@@ -5,6 +5,7 @@
 SHELL=/bin/sh
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/pi/raspberry/bitcoin-audit
+BITCOIN_AUDIT_HOME=/home/pi/raspberry/bitcoin-audit
 LOG=/var/log/bitcoin-audit-cron.log
 TZ=Europe/Zurich
 

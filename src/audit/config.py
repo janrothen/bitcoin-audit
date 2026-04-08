@@ -4,8 +4,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# src/audit/config.py → project root is three levels up
-_PROJECT_ROOT = Path(__file__).parent.parent.parent
+# Prefer an explicit env var so regular (non-editable) installs work correctly.
+# Falls back to three-levels-up, which is correct for editable dev installs
+# (src/audit/config.py → project root), but wrong for site-packages installs.
+_PROJECT_ROOT = (
+    Path(os.environ["BITCOIN_AUDIT_HOME"])
+    if "BITCOIN_AUDIT_HOME" in os.environ
+    else Path(__file__).parent.parent.parent
+)
 
 _config: dict | None = None
 _env_loaded = False
