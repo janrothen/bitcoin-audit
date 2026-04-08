@@ -21,4 +21,4 @@ class BitcoinClient:
         return self._txoutsetinfo["height"]
 
     def get_total_amount(self) -> Decimal:
-        return self._txoutsetinfo["total_amount"]
+        return Decimal(str(self._txoutsetinfo["total_amount"]))
