@@ -6,7 +6,7 @@ The project includes a cron file (`bitcoin-audit`) that runs the bot once a day 
 
 ### 1. Set the repo path
 
-Update the `HOME` variable at the top of `bitcoin-node-watchdog` to match where you cloned the repo.
+Update the `HOME` and `BITCOIN_AUDIT_HOME` variables at the top of `bitcoin-audit` to match where you cloned the repo.
 
 ### 2. Copy the scheduling file
 ```bash
