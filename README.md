@@ -7,6 +7,7 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=bugs)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=coverage)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=janrothen_bitcoin-audit&metric=security_rating)](https://sonarcloud.io/project/overview?id=janrothen_bitcoin-audit)
+[![GitGuardian](https://img.shields.io/badge/GitGuardian-monitored-blue?logo=gitguardian&logoColor=white)](https://www.gitguardian.com)
 
 A bot that posts the current Bitcoin block height and circulating supply once a day at midnight to X ([@BitcoinAudit](https://x.com/BitcoinAudit)). It connects to a local Bitcoin Core node via RPC, reads the UTXO set, calculates the delta since the previous run, and posts a formatted update. Runs as a cron job on a Raspberry Pi.
 
