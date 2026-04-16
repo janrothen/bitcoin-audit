@@ -77,7 +77,7 @@ class AuditBot:
                 self.state_file,
             )
             return True
-        except (json.JSONDecodeError, KeyError, InvalidOperation, ValueError) as e:
+        except (KeyError, InvalidOperation, ValueError) as e:
             raise RuntimeError(f"Corrupt state file at {self.state_file}: {e}") from e
         return False
 
