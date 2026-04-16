@@ -23,8 +23,8 @@ def test_bot_posts_and_saves_state(bitcoin_client, x_client, tmp_path):
         json.dumps(
             {
                 "block_height": 942377,
-                "total": "20007201.15532540",
                 "block_time": 1_700_000_160,
+                "total": "20007201.15532540",
             }
         )
     )
@@ -58,8 +58,8 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     state_file = tmp_path / "state.json"
     original = {
         "block_height": 942377,
-        "total": "20007201.15532540",
         "block_time": 1_700_000_160,
+        "total": "20007201.15532540",
     }
     state_file.write_text(json.dumps(original))
 
@@ -100,8 +100,8 @@ def test_no_tmp_file_left_after_successful_run(bitcoin_client, x_client, tmp_pat
         json.dumps(
             {
                 "block_height": 942377,
-                "total": "20007201.15532540",
                 "block_time": 1_700_000_160,
+                "total": "20007201.15532540",
             }
         )
     )

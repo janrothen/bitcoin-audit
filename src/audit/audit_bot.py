@@ -97,8 +97,8 @@ class AuditBot:
     def _save_state(self) -> None:
         state = {
             "block_height": self.current_block_height,
-            "total": str(self.current_total),
             "block_time": self.current_block_time,
+            "total": str(self.current_total),
         }
         # Write to a temp file first, then atomically replace the real state file.
         # os.replace() is POSIX-atomic: the old file is never left partially overwritten,
