@@ -84,11 +84,11 @@ class AuditBot:
     def _post(self) -> None:
         creator = PostCreator(
             self.current_block_height,
-            self.current_total,
             self.current_block_time,
+            self.current_total,
             self.previous_block_height,
-            self.previous_total,
             self.previous_block_time,
+            self.previous_total,
         )
         self.post = creator.create_post()
         self.x_client.post(self.post)
