@@ -39,30 +39,30 @@ class PostCreator:
     def __init__(
         self,
         height_current: int,
-        total_current: BTCAmount,
         block_time_current: int,
+        total_current: BTCAmount,
         height_previous: int,
-        total_previous: BTCAmount,
         block_time_previous: int,
+        total_previous: BTCAmount,
     ) -> None:
         if height_current < height_previous:
             raise ValueError(
                 f"Block height decreased: {height_previous} -> {height_current}"
             )
-        if total_current < total_previous:
-            raise ValueError(
-                f"Total supply decreased: {total_previous} -> {total_current}"
-            )
         if block_time_current < block_time_previous:
             raise ValueError(
                 f"Block time decreased: {block_time_previous} -> {block_time_current}"
             )
+        if total_current < total_previous:
+            raise ValueError(
+                f"Total supply decreased: {total_previous} -> {total_current}"
+            )
         self.height_current = height_current
         self.height_previous = height_previous
-        self.total_current = total_current
-        self.total_previous = total_previous
         self.block_time_current = block_time_current
         self.block_time_previous = block_time_previous
+        self.total_current = total_current
+        self.total_previous = total_previous
 
     def block_height_increase_since_previous(self) -> int:
         return self.height_current - self.height_previous
