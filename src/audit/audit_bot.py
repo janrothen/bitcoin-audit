@@ -82,6 +82,12 @@ class AuditBot:
         return False
 
     def _post(self) -> None:
+        assert self.current_block_height is not None
+        assert self.current_block_time is not None
+        assert self.current_total is not None
+        assert self.previous_block_height is not None
+        assert self.previous_block_time is not None
+        assert self.previous_total is not None
         creator = PostCreator(
             self.current_block_height,
             self.current_block_time,
