@@ -37,8 +37,10 @@ class AuditBot:
         )
         self.current_block_height: int | None = None
         self.current_total: Decimal | None = None
+        self.current_block_time: int | None = None
         self.previous_block_height: int | None = None
         self.previous_total: Decimal | None = None
+        self.previous_block_time: int | None = None
         self.post: str | None = None
 
     def run(self) -> None:
@@ -57,6 +59,9 @@ class AuditBot:
     def _fetch_current(self) -> None:
         self.current_block_height = self.bitcoin_client.get_block_height()
         self.current_total = self.bitcoin_client.get_total_amount()
+        self.current_block_time = self.bitcoin_client.get_block_time(
+            self.current_block_height
+        )
 
     def _fetch_previous(self) -> bool:
         """Load previous state. Returns True if bootstrapping (no state file existed)."""
@@ -64,6 +69,7 @@ class AuditBot:
             state = json.loads(self.state_file.read_text())
             self.previous_block_height = state["block_height"]
             self.previous_total = Decimal(state["total"])
+            self.previous_block_time = int(state["block_time"])
         except FileNotFoundError:
             logger.warning(
                 "No state file found at %s — bootstrapping. "
@@ -71,7 +77,7 @@ class AuditBot:
                 self.state_file,
             )
             return True
-        except (json.JSONDecodeError, KeyError, InvalidOperation) as e:
+        except (json.JSONDecodeError, KeyError, InvalidOperation, ValueError) as e:
             raise RuntimeError(f"Corrupt state file at {self.state_file}: {e}") from e
         return False
 
@@ -79,8 +85,10 @@ class AuditBot:
         creator = PostCreator(
             self.current_block_height,
             self.current_total,
+            self.current_block_time,
             self.previous_block_height,
             self.previous_total,
+            self.previous_block_time,
         )
         self.post = creator.create_post()
         self.x_client.post(self.post)
@@ -90,6 +98,7 @@ class AuditBot:
         state = {
             "block_height": self.current_block_height,
             "total": str(self.current_total),
+            "block_time": self.current_block_time,
         }
         # Write to a temp file first, then atomically replace the real state file.
         # os.replace() is POSIX-atomic: the old file is never left partially overwritten,

@@ -10,12 +10,29 @@ def _format_btc(amount: BTCAmount) -> str:
     return f"{amount:,.8f}"
 
 
+def _format_duration(seconds: int) -> str:
+    """Format a non-negative second count as `Xhrs Ymin Zsec`, switching to
+    `Nday[s] Xhrs Ymin Zsec` once the duration reaches 25 hours. The 25-hour
+    threshold (rather than 24h) keeps routine daily runs that drift slightly
+    past 24h in the simpler hours-only form instead of showing `1day 0hrs …`.
+    """
+    if seconds < 25 * 3600:
+        hrs, rem = divmod(seconds, 3600)
+        minutes, sec = divmod(rem, 60)
+        return f"{hrs}hrs {minutes}min {sec}sec"
+    days, rem = divmod(seconds, 86400)
+    hrs, rem = divmod(rem, 3600)
+    minutes, sec = divmod(rem, 60)
+    unit = "day" if days == 1 else "days"
+    return f"{days}{unit} {hrs}hrs {minutes}min {sec}sec"
+
+
 class PostCreator:
     """Composes the text for a daily Bitcoin audit post.
 
-    Given the current and previous block height and circulating supply,
-    calculates the deltas and formats them into a ready-to-post string.
-    Raises ValueError on construction if the block height or total supply
+    Given the current and previous block height, circulating supply, and
+    block timestamps, calculates the deltas and formats them into a
+    ready-to-post string. Raises ValueError on construction if any of those
     would decrease between runs, which indicates corrupt or out-of-order state.
     """
 
@@ -23,8 +40,10 @@ class PostCreator:
         self,
         height_current: int,
         total_current: BTCAmount,
+        block_time_current: int,
         height_previous: int,
         total_previous: BTCAmount,
+        block_time_previous: int,
     ) -> None:
         if height_current < height_previous:
             raise ValueError(
@@ -34,10 +53,16 @@ class PostCreator:
             raise ValueError(
                 f"Total supply decreased: {total_previous} -> {total_current}"
             )
+        if block_time_current < block_time_previous:
+            raise ValueError(
+                f"Block time decreased: {block_time_previous} -> {block_time_current}"
+            )
         self.height_current = height_current
         self.height_previous = height_previous
         self.total_current = total_current
         self.total_previous = total_previous
+        self.block_time_current = block_time_current
+        self.block_time_previous = block_time_previous
 
     def block_height_increase_since_previous(self) -> int:
         return self.height_current - self.height_previous
@@ -55,10 +80,14 @@ class PostCreator:
         return f"{pct}%"
 
     def create_post(self) -> str:
+        time_elapsed = _format_duration(
+            self.block_time_current - self.block_time_previous
+        )
         return _TEMPLATE.format(
             height=self.height_current,
             height_previous=self.height_previous,
             total=_format_btc(self.total_current),
+            time_elapsed=time_elapsed,
             increase_blocks=f"{self.block_height_increase_since_previous():,}",
             increase_total=self.total_increase_since_previous_formatted(),
             mined=self.mined_percentage_formatted(),
@@ -69,6 +98,7 @@ _TEMPLATE = """\
 #Bitcoin block {height}
 
 Δ since block {height_previous}:
++{time_elapsed}
 +{increase_blocks} blocks
 +{increase_total} BTC
 

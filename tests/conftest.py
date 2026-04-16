@@ -16,6 +16,10 @@ def env_vars(monkeypatch):
     monkeypatch.setenv("X_ACCESS_TOKEN_SECRET", "test_access_token_secret")
 
 
+CURRENT_BLOCK_TIME = 1_700_086_512
+PREVIOUS_BLOCK_TIME = 1_700_000_160  # 23hrs 59min 12sec earlier
+
+
 class MockBitcoinClient(BitcoinClientProtocol):
     @override
     def get_block_height(self) -> int:
@@ -24,6 +28,10 @@ class MockBitcoinClient(BitcoinClientProtocol):
     @override
     def get_total_amount(self) -> Decimal:
         return Decimal("20007685.53030772")
+
+    @override
+    def get_block_time(self, height: int) -> int:
+        return CURRENT_BLOCK_TIME
 
 
 class MockXClient(XClientProtocol):
