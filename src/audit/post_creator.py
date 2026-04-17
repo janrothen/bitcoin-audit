@@ -18,6 +18,8 @@ def _format_duration(seconds: int) -> str:
     threshold (rather than 24h) keeps routine daily runs that drift slightly
     past 24h in the simpler hours-only form instead of showing `1day 0hrs …`.
     """
+    if seconds < 0:
+        raise ValueError(f"seconds must be non-negative, got {seconds}")
     if seconds < 25 * 3600:
         hrs, rem = divmod(seconds, 3600)
         minutes, sec = divmod(rem, 60)

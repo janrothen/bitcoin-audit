@@ -106,3 +106,8 @@ def test_raises_on_negative_time_delta():
 )
 def test_format_duration(seconds, expected):
     assert _format_duration(seconds) == expected
+
+
+def test_format_duration_rejects_negative():
+    with pytest.raises(ValueError, match="seconds must be non-negative"):
+        _format_duration(-1)
