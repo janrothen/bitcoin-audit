@@ -38,15 +38,11 @@ class AuditBot:
         )
 
     def run(self) -> None:
-        try:
-            current = self._fetch_current()
-            previous = self._fetch_previous()
-            if previous is not None:
-                self._post(current, previous)
-            self._save_state(current)
-        except Exception:
-            logger.exception("Audit run failed")
-            raise
+        current = self._fetch_current()
+        previous = self._fetch_previous()
+        if previous is not None:
+            self._post(current, previous)
+        self._save_state(current)
 
     def _fetch_current(self) -> State:
         height = self.bitcoin_client.get_block_height()
