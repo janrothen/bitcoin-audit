@@ -31,6 +31,16 @@ sudo chown pi:pi /var/log/bitcoin-audit-cron.log
 sudo systemctl status cron
 ```
 
+## Updating an existing deployment
+
+The cron job runs `.venv/bin/python -m audit`, which uses the installed package in the venv — **not** the working tree. After pulling new code you must reinstall, otherwise cron keeps executing the old version:
+
+```bash
+cd $BITCOIN_AUDIT_HOME
+git pull
+.venv/bin/pip install .
+```
+
 ## Logs
 
 Output is appended to `/var/log/bitcoin-audit-cron.log`:

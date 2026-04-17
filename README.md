@@ -129,6 +129,7 @@ See [deploy/cron/README.md](deploy/cron/README.md) for installation steps.
 | No post on first run | Expected — the bot bootstraps `state.json` on the first run and posts from the second run onwards |
 | Bot not running at midnight | Check `sudo systemctl status cron` and confirm the log file is writable by `pi` |
 | `gettxoutsetinfo` times out | The RPC call scans the UTXO set and is slow; increase `timeout` in `config.toml` |
+| Post missing fields added in a recent release, or `Corrupt state file` after updating | The venv still holds the old package — run `.venv/bin/pip install .` after every `git pull`. See [deploy/cron/README.md](deploy/cron/README.md#updating-an-existing-deployment) |
 
 ## State file
 
