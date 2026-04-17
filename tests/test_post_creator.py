@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 
 from audit.post_creator import PostCreator, _format_duration
+from audit.state import State
 
 EXPECTED_POST = """\
 #Bitcoin block 942532
@@ -17,14 +18,20 @@ Mined: 95.27% of max supply\
 """
 
 
+def _state(
+    block_height: int, block_time: int, total: str | Decimal = Decimal("0")
+) -> State:
+    return State(
+        block_height=block_height,
+        block_time=block_time,
+        total=total if isinstance(total, Decimal) else Decimal(total),
+    )
+
+
 def test_create_post():
     creator = PostCreator(
-        942532,
-        1_700_086_512,
-        Decimal("20007685.53030772"),
-        942377,
-        1_700_000_160,
-        Decimal("20007201.15532540"),
+        _state(942532, 1_700_086_512, "20007685.53030772"),
+        _state(942377, 1_700_000_160, "20007201.15532540"),
     )
     assert creator.create_post() == EXPECTED_POST
 
@@ -40,60 +47,44 @@ def test_create_post():
     ],
 )
 def test_total_increase_formatted(current, previous, expected):
-    creator = PostCreator(0, 0, current, 0, 0, previous)
+    creator = PostCreator(_state(0, 0, current), _state(0, 0, previous))
     assert creator.total_increase_since_previous_formatted() == expected
 
 
 def test_block_height_increase():
     creator = PostCreator(
-        942532,
-        0,
-        Decimal("20007685.53030772"),
-        942377,
-        0,
-        Decimal("20007201.15532540"),
+        _state(942532, 0, "20007685.53030772"),
+        _state(942377, 0, "20007201.15532540"),
     )
     assert creator.block_height_increase_since_previous() == 155
 
 
 def test_mined_percentage_formatted():
-    creator = PostCreator(0, 0, Decimal("19243704.10556611"), 0, 0, Decimal("0"))
+    creator = PostCreator(_state(0, 0, "19243704.10556611"), _state(0, 0, "0"))
     assert creator.mined_percentage_formatted() == "91.63%"
 
 
 def test_raises_on_negative_block_delta():
     with pytest.raises(ValueError, match="Block height decreased"):
         PostCreator(
-            941878,
-            0,
-            Decimal("20006091.78041419"),
-            942022,
-            0,
-            Decimal("20005248.03041419"),
+            _state(941878, 0, "20006091.78041419"),
+            _state(942022, 0, "20005248.03041419"),
         )
 
 
 def test_raises_on_negative_total_delta():
     with pytest.raises(ValueError, match="Total supply decreased"):
         PostCreator(
-            942022,
-            0,
-            Decimal("20005248.03041419"),
-            941878,
-            0,
-            Decimal("20006091.78041419"),
+            _state(942022, 0, "20005248.03041419"),
+            _state(941878, 0, "20006091.78041419"),
         )
 
 
 def test_raises_on_negative_time_delta():
     with pytest.raises(ValueError, match="Block time decreased"):
         PostCreator(
-            942532,
-            1_700_000_000,
-            Decimal("20007685.53030772"),
-            942377,
-            1_700_086_400,
-            Decimal("20007201.15532540"),
+            _state(942532, 1_700_000_000, "20007685.53030772"),
+            _state(942377, 1_700_086_400, "20007201.15532540"),
         )
 
 

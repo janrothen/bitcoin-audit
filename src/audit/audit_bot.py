@@ -1,12 +1,13 @@
 import json
 import logging
 import os
-from decimal import Decimal, InvalidOperation
+from decimal import InvalidOperation
 from pathlib import Path
 
 from audit.config import config, project_root
 from audit.post_creator import PostCreator
 from audit.protocols import BitcoinClientProtocol, XClientProtocol
+from audit.state import State
 
 logger = logging.getLogger(__name__)
 
@@ -35,84 +36,66 @@ class AuditBot:
             if state_file
             else project_root() / config()["state"]["file"]
         )
-        self.current_block_height: int | None = None
-        self.current_total: Decimal | None = None
-        self.current_block_time: int | None = None
-        self.previous_block_height: int | None = None
-        self.previous_total: Decimal | None = None
-        self.previous_block_time: int | None = None
-        self.post: str | None = None
 
     def run(self) -> None:
         try:
-            self._fetch_current()
-            bootstrapped = self._fetch_previous()
-            if bootstrapped:
-                self._save_state()
-            else:
-                self._post()
-                self._save_state()
+            current = self._fetch_current()
+            previous = self._fetch_previous()
+            if previous is not None:
+                self._post(current, previous)
+            self._save_state(current)
         except Exception:
             logger.exception("Audit run failed")
             raise
 
-    def _fetch_current(self) -> None:
-        self.current_block_height = self.bitcoin_client.get_block_height()
-        self.current_total = self.bitcoin_client.get_total_amount()
-        self.current_block_time = self.bitcoin_client.get_block_time(
-            self.current_block_height
+    def _fetch_current(self) -> State:
+        height = self.bitcoin_client.get_block_height()
+        return State(
+            block_height=height,
+            block_time=self.bitcoin_client.get_block_time(height),
+            total=self.bitcoin_client.get_total_amount(),
         )
 
-    def _fetch_previous(self) -> bool:
-        """Load previous state. Returns True if bootstrapping (no state file existed)."""
+    def _fetch_previous(self) -> State | None:
+        """Load previous state. Returns None when no state file exists (bootstrap)."""
         try:
-            state = json.loads(self.state_file.read_text())
-            self.previous_block_height = state["block_height"]
-            self.previous_total = Decimal(state["total"])
-            self.previous_block_time = int(state["block_time"])
+            data = json.loads(self.state_file.read_text())
+            return State.from_dict(data)
         except FileNotFoundError:
             logger.warning(
                 "No state file found at %s — bootstrapping. "
                 "Current state saved; post will be made on next run.",
                 self.state_file,
             )
-            return True
+            return None
         except (KeyError, InvalidOperation, ValueError) as e:
             raise RuntimeError(f"Corrupt state file at {self.state_file}: {e}") from e
-        return False
 
-    def _post(self) -> None:
-        assert self.current_block_height is not None
-        assert self.current_block_time is not None
-        assert self.current_total is not None
-        assert self.previous_block_height is not None
-        assert self.previous_block_time is not None
-        assert self.previous_total is not None
-        creator = PostCreator(
-            self.current_block_height,
-            self.current_block_time,
-            self.current_total,
-            self.previous_block_height,
-            self.previous_block_time,
-            self.previous_total,
-        )
-        self.post = creator.create_post()
-        self.x_client.post(self.post)
-        logger.info("Post created on X (block %d)", self.current_block_height)
+    def _post(self, current: State, previous: State) -> None:
+        creator = PostCreator(current, previous)
+        self.x_client.post(creator.create_post())
+        logger.info("Post created on X (block %d)", current.block_height)
 
-    def _save_state(self) -> None:
-        state = {
-            "block_height": self.current_block_height,
-            "block_time": self.current_block_time,
-            "total": str(self.current_total),
-        }
-        # Write to a temp file first, then atomically replace the real state file.
-        # os.replace() is POSIX-atomic: the old file is never left partially overwritten,
-        # so a crash or disk-full error between post and save can't corrupt state.json.
+    def _save_state(self, state: State) -> None:
+        # Durable atomic write on a Pi that can lose power mid-run:
+        #   - fsync(tmp) so os.replace swaps in content that's on disk, not just
+        #     in the page cache.
+        #   - os.replace is metadata-atomic, so state.json is never torn.
+        #   - fsync(parent dir) so the rename itself survives a power cut —
+        #     otherwise the directory entry can come back empty.
         tmp = self.state_file.with_suffix(".tmp")
+        payload = json.dumps(state.to_dict())
         try:
-            tmp.write_text(json.dumps(state))
+            with open(tmp, "w") as f:
+                f.write(payload)
+                f.flush()
+                os.fsync(f.fileno())
             os.replace(tmp, self.state_file)
+            dir_fd = os.open(self.state_file.parent, os.O_DIRECTORY)
+            try:
+                os.fsync(dir_fd)
+            finally:
+                os.close(dir_fd)
         except Exception:
             tmp.unlink(missing_ok=True)
             raise
