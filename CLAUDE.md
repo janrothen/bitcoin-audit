@@ -14,6 +14,7 @@ src/audit/
     config.py            # tomllib config loader
     audit_bot.py         # AuditBot
     post_creator.py
+    state.py             # State dataclass (state.json contract)
     clients/
         bitcoin_client.py  # connects to local Bitcoin node via RPC
         x_client.py        # posts to X via tweepy v2
@@ -26,7 +27,7 @@ deploy/
         README.md        # installation steps
 config.toml              # runtime config (non-secret settings)
 .env                     # credentials/secrets (not committed)
-state.json               # persists previous block height + total
+state.json               # persists previous block height, block time + total
 pyproject.toml
 ```
 
