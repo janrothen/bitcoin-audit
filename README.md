@@ -45,7 +45,7 @@ sequenceDiagram
     AuditBot->>Bitcoin Core RPC: gettxoutsetinfo
     Bitcoin Core RPC-->>AuditBot: block height & total supply
     AuditBot->>AuditBot: load state.json (previous snapshot)
-    AuditBot->>AuditBot: format post (delta, supply, %)
+    AuditBot->>AuditBot: format post (delta, time elapsed, supply, %)
     AuditBot->>X API: post tweet
     X API-->>AuditBot: 201 Created
     AuditBot->>AuditBot: save state.json (atomic)
@@ -133,9 +133,11 @@ See [deploy/cron/README.md](deploy/cron/README.md) for installation steps.
 
 ## State file
 
-`state.json` persists the block height and circulating supply from the previous run. It is used to calculate the delta shown in each post.
+`state.json` persists the block height, block timestamp, and circulating supply from the previous run. These are used to calculate the deltas (blocks mined, time elapsed since previous block, supply issued) shown in each post.
 
 The file is created automatically on first run — no post is made that time, since there is no previous state to compare against. The second run proceeds normally.
+
+Writes are power-safe: the new snapshot is written to a temp file, fsynced, atomically renamed over `state.json`, and the parent directory is fsynced — a power cut on the Pi cannot leave the file truncated.
 
 If the file is deleted, the bot bootstraps itself again on the next run.
 
