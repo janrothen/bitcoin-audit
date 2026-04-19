@@ -117,7 +117,8 @@ Tests use mock implementations of `BitcoinClientProtocol` and `XClientProtocol` 
 
 ## Deployment
 
-See [deploy/cron/README.md](deploy/cron/README.md) for installation steps.
+- [deploy/cron/README.md](deploy/cron/README.md) — cron job that runs the bot daily.
+- [deploy/logrotate.d/README.md](deploy/logrotate.d/README.md) — logrotate drop-in that keeps `/var/log/bitcoin-audit-cron.log` bounded.
 
 ## Troubleshooting
 
