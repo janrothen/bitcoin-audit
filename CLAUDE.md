@@ -25,6 +25,9 @@ deploy/
     cron/
         bitcoin-audit    # cron file — copy to /etc/cron.d/ on the Pi
         README.md        # installation steps
+    logrotate.d/
+        bitcoin-audit    # logrotate drop-in — copy to /etc/logrotate.d/
+        README.md        # installation steps
 config.toml              # runtime config (non-secret settings)
 .env                     # credentials/secrets (not committed)
 state.json               # persists previous block height, block time + total
@@ -48,3 +51,8 @@ python -m audit
 See `deploy/cron/bitcoin-audit` — copy it to `/etc/cron.d/` on the Pi.
 The cron file sets `TZ=Europe/Zurich`, so `0 0 * * *` fires at Swiss midnight.
 See `deploy/cron/README.md` for full installation steps.
+
+## Log rotation
+See `deploy/logrotate.d/bitcoin-audit` — copy it to `/etc/logrotate.d/` on the Pi.
+Rotates `/var/log/bitcoin-audit-cron.log` weekly, keeping 4 compressed copies.
+See `deploy/logrotate.d/README.md` for full installation steps.
