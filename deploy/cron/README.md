@@ -6,27 +6,36 @@ The project includes a cron file (`bitcoin-audit`) that runs the bot once a day 
 
 ### 1. Set the repo path
 
-Update the `HOME` and `BITCOIN_AUDIT_HOME` variables at the top of `bitcoin-audit` to match where you cloned the repo.
+Update the `BITCOIN_AUDIT_HOME` variable at the top of `bitcoin-audit` to match where you cloned the repo.
 
-### 2. Copy the scheduling file
+### 2. Verify the system timezone
+
+Debian's default cron matches schedules against the **system** timezone — the `TZ` variable in the cron file only sets the job's environment. For the job to fire at Swiss midnight:
+
+```bash
+timedatectl                                        # should show Europe/Zurich
+sudo timedatectl set-timezone Europe/Zurich        # if it doesn't
+```
+
+### 3. Copy the scheduling file
 ```bash
 sudo cp bitcoin-audit /etc/cron.d/
 ```
 
-### 3. Set proper permissions
+### 4. Set proper permissions
 ```bash
 sudo chmod 644 /etc/cron.d/bitcoin-audit
 sudo chown root:root /etc/cron.d/bitcoin-audit
 ```
 
-### 4. Create the log file
+### 5. Create the log file
 The cron job runs as user `pi` which cannot create files in `/var/log/` by default:
 ```bash
 sudo touch /var/log/bitcoin-audit-cron.log
 sudo chown pi:pi /var/log/bitcoin-audit-cron.log
 ```
 
-### 5. Verify cron picked it up
+### 6. Verify cron picked it up
 ```bash
 sudo systemctl status cron
 ```

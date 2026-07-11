@@ -1,13 +1,19 @@
 # File: /etc/cron.d/bitcoin-audit
 # Purpose: Run the Bitcoin Audit bot once a day at midnight to post to @BitcoinAudit on X
 # Owner: root:root, Permissions: 644 (readable by root & cron daemon)
+#
+# NOTE on timing: Debian's default cron matches schedules against the *system*
+# timezone — the TZ variable below only sets the job's environment. For
+# `0 0 * * *` to fire at Swiss midnight, the Pi's system timezone must be
+# Europe/Zurich:
+#   check:  timedatectl
+#   set:    sudo timedatectl set-timezone Europe/Zurich
 
 SHELL=/bin/sh
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
-HOME=/home/pi/raspberry/bitcoin-audit
 BITCOIN_AUDIT_HOME=/home/pi/raspberry/bitcoin-audit
 LOG=/var/log/bitcoin-audit-cron.log
 TZ=Europe/Zurich
 
-# --- Daily audit post (00:00 Swiss time) ----------------------------------
-0 0 * * *  pi  cd $HOME && .venv/bin/python -m audit >> $LOG 2>&1
+# --- Daily audit post (00:00, in the system timezone — see NOTE above) -----
+0 0 * * *  pi  cd $BITCOIN_AUDIT_HOME && .venv/bin/python -m audit >> $LOG 2>&1

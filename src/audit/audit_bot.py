@@ -53,9 +53,20 @@ class AuditBot:
         )
 
     def _fetch_previous(self) -> State | None:
-        """Load previous state. Returns None when no state file exists (bootstrap)."""
+        """Load previous state. Returns None (bootstrap) when no state file
+        exists, or when the file uses the legacy pre-block_time schema —
+        deltas can't be computed against it, so the bot re-bootstraps
+        instead of crashing every night until someone intervenes.
+        """
         try:
             data = json.loads(self.state_file.read_text())
+            if self._is_legacy_state(data):
+                logger.warning(
+                    "Legacy state file at %s (no block_time) — re-bootstrapping. "
+                    "Current state saved; post will be made on next run.",
+                    self.state_file,
+                )
+                return None
             return State.from_dict(data)
         except FileNotFoundError:
             logger.warning(
@@ -64,8 +75,20 @@ class AuditBot:
                 self.state_file,
             )
             return None
-        except (KeyError, InvalidOperation, ValueError) as e:
+        except (KeyError, InvalidOperation, TypeError, ValueError) as e:
             raise RuntimeError(f"Corrupt state file at {self.state_file}: {e}") from e
+
+    @staticmethod
+    def _is_legacy_state(data: object) -> bool:
+        """Pre-block_time schema: has the other expected keys but no block_time.
+        Anything else malformed falls through to from_dict and is reported
+        as corrupt.
+        """
+        return (
+            isinstance(data, dict)
+            and "block_time" not in data
+            and data.keys() >= {"block_height", "total"}
+        )
 
     def _post(self, current: State, previous: State) -> None:
         creator = PostCreator(current, previous)

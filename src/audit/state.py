@@ -16,10 +16,13 @@ class State:
 
     @classmethod
     def from_dict(cls, data: dict) -> "State":
+        # str() before Decimal so a hand-edited file with a bare JSON number
+        # (parsed as float) round-trips exactly instead of inheriting the
+        # float's binary expansion.
         return cls(
             block_height=int(data["block_height"]),
             block_time=int(data["block_time"]),
-            total=Decimal(data["total"]),
+            total=Decimal(str(data["total"])),
         )
 
     def to_dict(self) -> dict:
