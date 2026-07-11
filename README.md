@@ -130,6 +130,7 @@ Tests use mock implementations of `BitcoinClientProtocol` and `XClientProtocol` 
 | `403 Forbidden` from X API | App does not have write permissions — regenerate tokens after enabling read/write in the Developer Portal |
 | No post on first run | Expected — the bot bootstraps `state.json` on the first run and posts from the second run onwards |
 | Bot not running at midnight | Check `sudo systemctl status cron` and confirm the log file is writable by `pi` |
+| Post fires at the wrong hour | Debian's cron matches schedules against the **system** timezone (the `TZ` variable in the cron file only affects the job's environment) — run `timedatectl` and set `sudo timedatectl set-timezone Europe/Zurich` |
 | `gettxoutsetinfo` times out | The RPC call scans the UTXO set and is slow; increase `timeout` in `config.toml` |
 | Post missing fields added in a recent release, or `Corrupt state file` after updating | The venv still holds the old package — run `.venv/bin/pip install .` after every `git pull`. See [deploy/cron/README.md](deploy/cron/README.md#updating-an-existing-deployment) |
 
@@ -141,7 +142,7 @@ The file is created automatically on first run — no post is made that time, si
 
 Writes are power-safe: the new snapshot is written to a temp file, fsynced, atomically renamed over `state.json`, and the parent directory is fsynced — a power cut on the Pi cannot leave the file truncated.
 
-If the file is deleted, the bot bootstraps itself again on the next run.
+If the file is deleted, the bot bootstraps itself again on the next run. The same applies to a state file written by a version that predates the `block_time` field (legacy schema): it is not treated as corrupt — the bot logs a warning and re-bootstraps. A file that is actually corrupt (unparseable, missing other fields, wrong types) makes the run fail loudly instead of posting a bogus delta.
 
 ## Security
 

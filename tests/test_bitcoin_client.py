@@ -7,7 +7,10 @@ from audit.clients.bitcoin_client import BitcoinClient
 
 MOCK_TXOUTSETINFO = {
     "height": 942022,
-    "total_amount": 20006091.78041419,  # float, matching the real RPC response type
+    # python-bitcoinrpc parses JSON floats as Decimal (parse_float=decimal.Decimal),
+    # so the real response type is Decimal. A float here deliberately exercises
+    # the defensive Decimal(str(...)) path in get_total_amount.
+    "total_amount": 20006091.78041419,
 }
 
 

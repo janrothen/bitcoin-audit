@@ -79,9 +79,10 @@ def test_state_not_saved_on_post_failure(bitcoin_client, x_client, tmp_path):
     "content",
     [
         "not json",
+        "null",  # valid JSON, not a dict
         '{"block_height": 942377}',  # missing "total" key
         '{"block_height": 942377, "total": "not-a-decimal", "block_time": 1700000160}',
-        '{"block_height": 942377, "total": "20007201.15532540"}',  # missing "block_time"
+        '{"block_height": null, "total": "20007201.15532540", "block_time": 1700000160}',
         '{"block_height": 942377, "total": "20007201.15532540", "block_time": "nope"}',
     ],
 )
@@ -92,6 +93,46 @@ def test_corrupt_state_file_raises(bitcoin_client, x_client, tmp_path, content):
     bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
     with pytest.raises(RuntimeError, match="Corrupt state file"):
         bot.run()
+
+
+def test_legacy_state_file_rebootstraps(bitcoin_client, x_client, tmp_path):
+    """A pre-block_time state file is not corrupt — the bot re-bootstraps."""
+    state_file = tmp_path / "state.json"
+    state_file.write_text('{"block_height": 942377, "total": "20007201.15532540"}')
+
+    bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
+    bot.run()
+
+    assert x_client.posted is None  # no post against a legacy snapshot
+
+    saved = json.loads(state_file.read_text())
+    assert saved["block_height"] == 942532
+    assert saved["total"] == "20007685.53030772"
+    assert saved["block_time"] == 1_700_086_512
+
+
+def test_tmp_file_cleaned_up_on_failed_save(
+    bitcoin_client, x_client, tmp_path, monkeypatch
+):
+    state_file = tmp_path / "state.json"
+    original = {
+        "block_height": 942377,
+        "block_time": 1_700_000_160,
+        "total": "20007201.15532540",
+    }
+    state_file.write_text(json.dumps(original))
+
+    def raise_error(src, dst):
+        raise OSError("disk full")
+
+    monkeypatch.setattr("audit.audit_bot.os.replace", raise_error)
+
+    bot = AuditBot(bitcoin_client, x_client, state_file=state_file)
+    with pytest.raises(OSError, match="disk full"):
+        bot.run()
+
+    assert json.loads(state_file.read_text()) == original  # old state intact
+    assert not state_file.with_suffix(".tmp").exists()  # no temp file left
 
 
 def test_no_tmp_file_left_after_successful_run(bitcoin_client, x_client, tmp_path):
