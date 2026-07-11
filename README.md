@@ -67,6 +67,7 @@ Copy `.env.example` to `.env` and fill in your credentials:
 
 ```bash
 cp .env.example .env
+chmod 600 .env  # it holds RPC and X credentials in plaintext — keep it owner-readable only
 ```
 
 ```dotenv
