@@ -11,6 +11,11 @@ dependencies = [
     "python-bitcoinrpc~=1.0",
     "python-dotenv~=1.2",
     "tweepy~=4.16",
+    # Security floors for transitive deps (via tweepy -> requests). Without
+    # these, `pip install .` keeps an already-installed vulnerable version.
+    "certifi>=2026.10.18",  # GHSA-6q48-6c7w-9gw2 (distrusted emSign root)
+    "idna>=3.15",           # GHSA-65pc-fj4g-8rjx (CVE-2026-45409)
+    "urllib3>=2.8.0",       # GHSA-qccp-gfcp-xxvc, GHSA-vxq7-64xx-v4gw, GHSA-8988-9cw3-xx77, ...
 ]
 
 [project.optional-dependencies]
@@ -19,6 +24,9 @@ dev = [
     "pytest-cov~=7.1",
     "pre-commit~=4.5",
     "ruff>=0.15.9",
+    # Security floors for transitive deps of pre-commit.
+    "virtualenv>=21.14.10",  # GHSA-6w3r-xr62-4xcp, GHSA-4f8h-vr72-p32c, ...
+    "filelock>=4.2.1",       # GHSA-69hj-f68j-2879, GHSA-j8f7-rjxc-mr56, ...
 ]
 
 [tool.hatch.build.targets.wheel]
