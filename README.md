@@ -18,7 +18,7 @@ A bot that posts the current Bitcoin block height and circulating supply once a 
 - Bitcoin Core node with RPC enabled and fully synced
 - X developer account with read/write app credentials
 - Python 3.13+
-- Dependencies: `python-bitcoinrpc`, `python-dotenv`, `tweepy`
+- Dependencies: `python-dotenv`, `requests`, `tweepy`
 
 ### Bitcoin Core RPC setup
 
