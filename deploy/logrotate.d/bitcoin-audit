@@ -9,5 +9,5 @@
     delaycompress
     missingok
     notifempty
-    create 0644 pi pi
+    create 0640 pi pi
 }

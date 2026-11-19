@@ -33,7 +33,9 @@ The cron job runs as user `pi` which cannot create files in `/var/log/` by defau
 ```bash
 sudo touch /var/log/bitcoin-audit-cron.log
 sudo chown pi:pi /var/log/bitcoin-audit-cron.log
+sudo chmod 640 /var/log/bitcoin-audit-cron.log
 ```
+Mode `640` keeps the log private to `pi` (logrotate recreates it with the same mode).
 
 ### 6. Verify cron picked it up
 ```bash

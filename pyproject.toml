@@ -8,10 +8,10 @@ version = "0.1.0"
 description = "Daily X bot that posts Bitcoin block height and circulating supply via cron on a Raspberry Pi."
 requires-python = ">=3.13"
 dependencies = [
-    "python-bitcoinrpc~=1.0",
-    "python-dotenv~=1.2",
-    "tweepy~=4.16",
-    # Security floors for transitive deps (via tweepy -> requests). Without
+    "python-dotenv~=1.2.4",
+    "requests~=2.34",
+    "tweepy~=4.17",
+    # Security floors for transitive deps (via requests). Without
     # these, `pip install .` keeps an already-installed vulnerable version.
     "certifi>=2026.10.18",  # GHSA-6q48-6c7w-9gw2 (distrusted emSign root)
     "idna>=3.15",           # GHSA-65pc-fj4g-8rjx (CVE-2026-45409)
@@ -20,10 +20,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest~=9.0",
+    "pytest~=9.2",
     "pytest-cov~=7.1",
-    "pre-commit~=4.5",
-    "ruff>=0.15.9",
+    "pre-commit~=4.7",
+    "ruff~=0.17.6",
     # Security floors for transitive deps of pre-commit.
     "virtualenv>=21.14.10",  # GHSA-6w3r-xr62-4xcp, GHSA-4f8h-vr72-p32c, ...
     "filelock>=4.2.1",       # GHSA-69hj-f68j-2879, GHSA-j8f7-rjxc-mr56, ...

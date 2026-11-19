@@ -6,7 +6,8 @@ The project includes a logrotate drop-in (`bitcoin-audit`) that keeps
 Rotation schedule:
 - weekly, keeping 4 compressed copies (~one month of history)
 - skipped if the log is missing or empty
-- rotated file recreated as `pi:pi` (the cron user) so writes still succeed
+- rotated file recreated as `pi:pi` (the cron user) so writes still succeed, with
+  mode `0640` so other local users cannot read the log
 
 ## Installation steps
 
