@@ -151,6 +151,8 @@ If the file is deleted, the bot bootstraps itself again on the next run. The sam
 - Never commit `state.json` — it is local runtime state.
 - RPC credentials in `bitcoin.conf` should match `.env` exactly; restrict `rpcallowip` to the Pi's IP only.
 - X access tokens grant write access to the account — treat them as passwords.
+- `pyproject.toml` sets minimum versions for some transitive dependencies (urllib3, certifi, idna) to exclude known-vulnerable releases. After a `git pull`, run `.venv/bin/pip install .` so an existing venv picks them up; `pip-audit` on the venv is a quick way to check.
+- GitHub Actions are pinned to commit SHAs and run with a read-only `GITHUB_TOKEN`.
 
 ## Contributing
 
